@@ -1,13 +1,7 @@
 import objectID from 'bson-objectid';
 import * as ActionTypes from '../../../constants';
 
-const defaultSketch = `function setup() { 
-  createCanvas(400, 400);
-} 
-
-function draw() { 
-  background(220);
-}`;
+const defaultSketch = '';
 
 const defaultHTML =
 `<!DOCTYPE html>
