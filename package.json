@@ -10,7 +10,7 @@
     "build": "NODE_ENV=production webpack --config webpack.config.prod.js --progress",
     "test": "npm run lint",
     "fetch-examples": "node fetch-examples.js",
-    "heroku-postbuild": "webpack --config webpack.config.prod.js --progress"
+    "heroku-postbuild": "touch .env; webpack --config webpack.config.prod.js --progress"
   },
   "main": "index.js",
   "author": "Cassie Tarakajian",
