@@ -1,9 +1,11 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { reduxForm } from 'redux-form';
 import classNames from 'classnames';
 import { browserHistory } from 'react-router';
 import InlineSVG from 'react-inlinesvg';
 import { bindActionCreators } from 'redux';
+import { Helmet } from 'react-helmet';
 import NewPasswordForm from '../components/NewPasswordForm';
 import * as UserActions from '../actions';
 
@@ -33,6 +35,9 @@ class NewPasswordView extends React.Component {
     });
     return (
       <div className={newPasswordClass}>
+        <Helmet>
+          <title>p5.js Web Editor | New Password</title>
+        </Helmet>
         <div className="form-container__header">
           <button className="form-container__logo-button" onClick={this.gotoHomePage}>
             <InlineSVG src={logoUrl} alt="p5js Logo" />

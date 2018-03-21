@@ -1,9 +1,11 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { Link, browserHistory } from 'react-router';
 import classNames from 'classnames';
 import InlineSVG from 'react-inlinesvg';
 import { bindActionCreators } from 'redux';
 import { reduxForm } from 'redux-form';
+import { Helmet } from 'react-helmet';
 import * as UserActions from '../actions';
 import ResetPasswordForm from '../components/ResetPasswordForm';
 
@@ -32,6 +34,9 @@ class ResetPasswordView extends React.Component {
     });
     return (
       <div className={resetPasswordClass}>
+        <Helmet>
+          <title>p5.js Web Editor | Reset Password</title>
+        </Helmet>
         <div className="form-container__header">
           <button className="form-container__logo-button" onClick={this.gotoHomePage}>
             <InlineSVG src={logoUrl} alt="p5js Logo" />

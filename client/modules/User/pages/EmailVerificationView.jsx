@@ -1,9 +1,11 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { browserHistory } from 'react-router';
 import InlineSVG from 'react-inlinesvg';
 import get from 'lodash/get';
+import { Helmet } from 'react-helmet';
 import { verifyEmailConfirmation } from '../actions';
 
 const exitUrl = require('../../../images/exit.svg');
@@ -68,6 +70,9 @@ class EmailVerificationView extends React.Component {
 
     return (
       <div className="form-container">
+        <Helmet>
+          <title>p5.js Web Editor | Email Verification</title>
+        </Helmet>
         <div className="form-container__header">
           <button className="form-container__logo-button" onClick={this.gotoHomePage}>
             <InlineSVG src={logoUrl} alt="p5js Logo" />

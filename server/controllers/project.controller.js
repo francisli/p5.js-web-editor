@@ -2,17 +2,13 @@ import archiver from 'archiver';
 import request from 'request';
 import moment from 'moment';
 import isUrl from 'is-url';
+import slugify from 'slugify';
 import jsdom, { serializeDocument } from 'jsdom';
 import Project from '../models/project';
 import User from '../models/user';
 import { deleteObjectsFromS3, getObjectKey } from './aws.controller';
 
 export function createProject(req, res) {
-  if (!req.user) {
-    res.status(403).send({ success: false, message: 'Session does not match owner of project.' });
-    return;
-  }
-
   let projectValues = {
     user: req.user._id
   };
@@ -38,7 +34,7 @@ export function createProject(req, res) {
 
 export function updateProject(req, res) {
   Project.findById(req.params.project_id, (findProjectErr, project) => {
-    if (!req.user || !project.user.equals(req.user._id)) {
+    if (!project.user.equals(req.user._id)) {
       res.status(403).send({ success: false, message: 'Session does not match owner of project.' });
       return;
     }
@@ -82,13 +78,24 @@ export function updateProject(req, res) {
 }
 
 export function getProject(req, res) {
-  Project.findById(req.params.project_id)
+  const projectId = req.params.project_id;
+  Project.findById(projectId)
     .populate('user', 'username')
-    .exec((err, project) => {
+    .exec((err, project) => { // eslint-disable-line
       if (err) {
         return res.status(404).send({ message: 'Project with that id does not exist' });
+      } else if (!project) {
+        Project.findOne({ slug: projectId })
+        .populate('user', 'username')
+        .exec((innerErr, projectBySlug) => {
+          if (innerErr || !projectBySlug) {
+            return res.status(404).send({ message: 'Project with that id does not exist' });
+          }
+          return res.json(projectBySlug);
+        });
+      } else {
+        return res.json(project);
       }
-      return res.json(project);
     });
 }
 
@@ -107,7 +114,7 @@ function deleteFilesFromS3(files) {
 
 export function deleteProject(req, res) {
   Project.findById(req.params.project_id, (findProjectErr, project) => {
-    if (!req.user || !project.user.equals(req.user._id)) {
+    if (!project.user.equals(req.user._id)) {
       res.status(403).json({ success: false, message: 'Session does not match owner of project.' });
       return;
     }
@@ -203,6 +210,34 @@ export function getProjectsForUser(req, res) {
   }
 }
 
+export function projectExists(projectId, callback) {
+  Project.findById(projectId, (err, project) => (
+    project ? callback(true) : callback(false)
+  ));
+}
+
+export function projectForUserExists(username, projectId, callback) {
+  User.findOne({ username }, (err, user) => {
+    if (!user) {
+      callback(false);
+      return;
+    }
+    Project.findOne({ _id: projectId, user: user._id }, (innerErr, project) => {
+      if (project) {
+        callback(true);
+        return;
+      }
+      Project.findOne({ slug: projectId, user: user._id }, (slugError, projectBySlug) => {
+        if (projectBySlug) {
+          callback(true);
+          return;
+        }
+        callback(false);
+      });
+    });
+  });
+}
+
 function bundleExternalLibs(project, zip, callback) {
   const indexHtml = project.files.find(file => file.name === 'index.html');
   let numScriptsResolved = 0;
@@ -255,7 +290,9 @@ function buildZip(project, req, res) {
     res.status(500).send({ error: err.message });
   });
 
-  res.attachment(`${project.name}.zip`);
+  const currentTime = moment().format('YYYY_MM_DD_HH_mm_ss');
+  project.slug = slugify(project.name, '_');
+  res.attachment(`${project.slug}_${currentTime}.zip`);
   zip.pipe(res);
 
   function addFileToZip(file, path) {

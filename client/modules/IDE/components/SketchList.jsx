@@ -1,9 +1,11 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import moment from 'moment';
 import { Link, browserHistory } from 'react-router';
 import InlineSVG from 'react-inlinesvg';
+import { Helmet } from 'react-helmet';
 import * as SketchActions from '../actions/projects';
 import * as ProjectActions from '../actions/project';
 import * as ToastActions from '../actions/toast';
@@ -16,10 +18,20 @@ class SketchList extends React.Component {
     this.props.getProjects(this.props.username);
   }
 
+  getSketchesTitle() {
+    if (this.props.username === this.props.user.username) {
+      return 'p5.js Web Editor | My sketches';
+    }
+    return `p5.js Web Editor | ${this.props.username}'s sketches`;
+  }
+
   render() {
     const username = this.props.username !== undefined ? this.props.username : this.props.user.username;
     return (
       <div className="sketches-table-container">
+        <Helmet>
+          <title>{this.getSketchesTitle()}</title>
+        </Helmet>
         { this.props.sketches.length === 0 &&
           <p className="sketches-table__empty">No sketches.</p>
         }
