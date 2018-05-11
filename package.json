@@ -14,7 +14,6 @@
     "test": "npm run lint",
     "fetch-examples": "node fetch-examples.js",
     "fetch-examples-gg": "node fetch-examples-gg.js",
-    "postinstall": "if [ -d '.git' ]; then git submodule update --remote --recursive; fi",
     "heroku-postbuild": "touch .env; npm run build"
   },
   "main": "index.js",
@@ -58,8 +57,8 @@
     "webpack-node-externals": "^1.7.2"
   },
   "engines": {
-    "node": "8.9.0",
-    "npm": "5.5.1"
+    "node": "8.11.1",
+    "npm": "5.6.0"
   },
   "dependencies": {
     "archiver": "^1.1.0",
