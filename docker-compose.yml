@@ -16,7 +16,12 @@ services:
       - S3_BUCKET=override_in_dotenv
       - GITHUB_ID=override_in_dotenv
       - GITHUB_SECRET=override_in_dotenv
+      - GOOGLE_ID=override_in_dotenv
+      - GOOGLE_SECRET=override_in_dotenv
       - MAILGUN_KEY=override_in_dotenv
+      - EXAMPLE_USERNAME=override_in_dotenv
+      - EXAMPLE_USER_EMAIL=override_in_dotenv
+      - EXAMPLE_USER_PASSWORD=override_in_dotenv
     volumes:
       - .:/opt/node/app
       - /opt/node/app/node_modules
