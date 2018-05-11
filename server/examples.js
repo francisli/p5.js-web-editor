@@ -11,9 +11,9 @@ const defaultHTML =
 `<!DOCTYPE html>
 <html>
   <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.sound.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.sound.min.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
     <meta charset="utf-8" />
   </head>
@@ -45,7 +45,7 @@ function getCategories() {
   const categories = [];
   const options = {
     url: `https://api.github.com/repos/processing/p5.js-website/contents/dist/assets/examples/en?client_id=${
-    clientId}&client_secret=${clientSecret}`,
+      clientId}&client_secret=${clientSecret}`,
     method: 'GET',
     headers,
     json: true
@@ -112,8 +112,10 @@ function getSketchContent(projectsInAllCategories) {
       if (noNumberprojectName === 'Instance Mode : Instance Container ') {
         for (let i = 0; i < 4; i += 1) {
           const splitedRes = `${res.split('*/')[1].split('</html>')[i]}</html>\n`;
-          project.sketchContent = splitedRes.replace('p5.js',
-            'https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.4/p5.min.js');
+          project.sketchContent = splitedRes.replace(
+            'p5.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.4/p5.min.js'
+          );
         }
       } else {
         project.sketchContent = res;
@@ -128,14 +130,14 @@ function getSketchContent(projectsInAllCategories) {
 function createProjectsInP5user(projectsInAllCategories) {
   const options = {
     url: `https://api.github.com/repos/processing/p5.js-website/contents/dist/assets/examples/assets?client_id=${
-    clientId}&client_secret=${clientSecret}`,
+      clientId}&client_secret=${clientSecret}`,
     method: 'GET',
     headers,
     json: true
   };
 
   rp(options).then((res) => {
-    User.findOne({ username: 'p5' }, (err, user) => {
+    User.findOne({ username: process.env.EXAMPLE_USERNAME }, (err, user) => {
       if (err) throw err;
 
       eachSeries(projectsInAllCategories, (projectsInOneCategory, categoryCallback) => {
@@ -229,7 +231,7 @@ function createProjectsInP5user(projectsInAllCategories) {
           }
 
           const assetsInProject = project.sketchContent.match(/assets\/[\w-]+\.[\w]*/g)
-            || project.sketchContent.match(/assets\/[\w-]*/g) || [];
+            || project.sketchContent.match(/asset\/[\w-]*/g) || [];
 
           assetsInProject.forEach((assetNamePath, i) => {
             let assetName = assetNamePath.split('assets/')[1];
@@ -287,15 +289,15 @@ function createProjectsInP5user(projectsInAllCategories) {
 }
 
 function getp5User() {
-  User.findOne({ username: 'p5' }, (err, user) => {
+  User.findOne({ username: process.env.EXAMPLE_USERNAME }, (err, user) => {
     if (err) throw err;
 
     let p5User = user;
     if (!p5User) {
       p5User = new User({
-        username: 'p5',
-        email: 'p5-examples@gmail.com',
-        password: 'test'
+        username: process.env.EXAMPLE_USERNAME,
+        email: process.env.EXAMPLE_USER_EMAIL,
+        password: process.env.EXAMPLE_USER_PASSWORD
       });
       p5User.save((saveErr) => {
         if (saveErr) throw saveErr;

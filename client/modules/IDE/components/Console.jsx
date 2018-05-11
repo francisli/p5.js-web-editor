@@ -18,7 +18,7 @@ class Console extends React.Component {
     });
 
     return (
-      <div className={consoleClass} role="main" tabIndex="0" title="console">
+      <div className={consoleClass} role="main" title="console">
         <div className="preview-console__header">
           <h2 className="preview-console__header-title">Console</h2>
           <div className="preview-console__header-buttons">
@@ -39,12 +39,11 @@ class Console extends React.Component {
         </div>
         <div ref={(element) => { this.consoleMessages = element; }} className="preview-console__messages">
           {this.props.consoleEvents.map((consoleEvent) => {
-            const args = consoleEvent.arguments;
-            const method = consoleEvent.method;
+            const { arguments: args, method } = consoleEvent;
             if (Object.keys(args).length === 0) {
               return (
                 <div key={consoleEvent.id} className="preview-console__undefined">
-                  <span key={`${consoleEvent.id}-0`}>{'undefined'}</span>
+                  <span key={`${consoleEvent.id}-0`}>undefined</span>
                 </div>
               );
             }
@@ -58,7 +57,6 @@ class Console extends React.Component {
       </div>
     );
   }
-
 }
 
 Console.propTypes = {

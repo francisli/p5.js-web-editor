@@ -23,10 +23,15 @@ This project is currently in development! It will be announced when there is a (
   S3_BUCKET=<your-s3-bucket>
   GITHUB_ID=<your-github-client-id>
   GITHUB_SECRET=<your-github-client-secret>
+  GOOGLE_ID=<your-google-client-id> (use google+ api)
+  GOOGLE_SECRET=<your-google-client-secret> (use google+ api)
   MAILGUN_KEY=<your-mailgun-api-key>
+  EXAMPLE_USERNAME=<your-name>
+  EXAMPLE_USER_EMAIL=<your-email-id>
+  EXAMPLE_USER_PASSWORD=<your-password>
   ```
 
-   If you don't care about being able to upload media files to S3 or Login with Github, you can drop in the file exactly how it is. Or, if you don't want to do that, just ask me to send you mine. Refer to [this gist](https://gist.github.com/catarak/70c9301f0fd1ac2d6b58de03f61997e3) for creating an S3 bucket for testing, or if you don't want to do that, I can add you to one of my S3 buckets.
+   If you don't care about being able to upload media files to S3 or Login with Github or Google, you can drop in the file exactly how it is. Or, if you don't want to do that, just ask me to send you mine. Refer to [this gist](https://gist.github.com/catarak/70c9301f0fd1ac2d6b58de03f61997e3) for creating an S3 bucket for testing, or if you don't want to do that, I can add you to one of my S3 buckets.
 
 6. `$ npm run fetch-examples` - this downloads the example sketches into a user called 'p5'
 7. `$ npm start`
@@ -82,12 +87,17 @@ If you don't have the full server environment running, you can launch a one-off 
   S3_BUCKET=<your-s3-bucket>
   GITHUB_ID=<your-github-client-id>
   GITHUB_SECRET=<your-github-client-secret>
+  GOOGLE_ID=<your-google-client-id> (use google+ api)
+  GOOGLE_SECRET=<your-google-client-secret> (use google+ api)
   EMAIL_SENDER=<email-address-to-send-from>
   MAILGUN_KEY=<mailgun-api-key>
   MAILGUN_DOMAIN=<mailgun-domain>
   EMAIL_VERIFY_SECRET_TOKEN=whatever_you_want_this_to_be_it_only_matters_for_production
+  EXAMPLE_USERNAME=<your-name>
+  EXAMPLE_USER_EMAIL=<your-email-id>
+  EXAMPLE_USER_PASSWORD=<your-password>
   ```
-  For production, you will need to have real Github and Amazon credentions. Refer to [this gist](https://gist.github.com/catarak/70c9301f0fd1ac2d6b58de03f61997e3) for creating an S3 bucket for testing.
+  For production, you will need to have real Github and Amazon credentials. Refer to [this gist](https://gist.github.com/catarak/70c9301f0fd1ac2d6b58de03f61997e3) for creating an S3 bucket for testing.
 
 5. `$ npm run fetch-examples` - this downloads the example sketches into a user called 'p5'
 6. `$ npm run build`
@@ -117,7 +127,7 @@ http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html#VirtualHostin
 
 ## Accessibility Guidelines
 
-Here is guide on [how to use the accessible editor](https://gist.github.com/MathuraMG/e86666b7b41fbc8c078bad9aff3f666d) and here is an overview of the [p5-accessibility.js](https://github.com/MathuraMG/p5-accessibility/blob/master/README.md) library that makes p5.js sketches accessible to screen readers.
+Here is guide on [how to use the accessible editor](https://gist.github.com/MathuraMG/e86666b7b41fbc8c078bad9aff3f666d) and here is an overview of the [p5-accessibility.js](https://github.com/processing/p5.accessibility) library that makes p5.js sketches accessible to screen readers.
 
 The code for the p5.js web editor adheres to web accessibility standards. The following guidelines will help to ensure that accessibility continues to be a priority as development continues.
 
@@ -144,7 +154,7 @@ See [CONTRIBUTING.md](https://github.com/processing/p5.js-web-editor/blob/master
 
 The p5.js Web Editor is built on a MERN stack - MongoDB, Express, React/Redux, and Node. For a reference to the file structure format I am using, please look at the [Mern Starter](https://github.com/Hashnode/mern-starter) and [this comment](https://github.com/Hashnode/mern-starter/issues/90#issuecomment-221553573).
 
-This project uses an in-development [p5-accessibility.js library](https://github.com/MathuraMG/p5-accessibility) for accessibility.
+This project uses an in-development [p5-accessibility.js library](https://github.com/processing/p5.accessibility) for accessibility.
 
 This project does not use CSS Modules, but uses Sass. I like to follow [BEM rules](http://getbem.com/) for CSS naming conventions, write OOSCSS with placeholders and mixins, and follow the [7-1 Pattern](https://sass-guidelin.es/#the-7-1-pattern) for Sass.
 

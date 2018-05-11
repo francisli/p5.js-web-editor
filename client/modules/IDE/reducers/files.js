@@ -7,9 +7,9 @@ const defaultHTML =
 `<!DOCTYPE html>
 <html>
   <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.sound.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.sound.min.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
     <meta charset="utf-8" />
 
@@ -70,9 +70,9 @@ const initialState = () => {
 
 function getAllDescendantIds(state, nodeId) {
   return state.find(file => file.id === nodeId).children
-  .reduce((acc, childId) => (
-    [...acc, childId, ...getAllDescendantIds(state, childId)]
-  ), []);
+    .reduce((acc, childId) => (
+      [...acc, childId, ...getAllDescendantIds(state, childId)]
+    ), []);
 }
 
 function deleteChild(state, parentId, id) {
@@ -129,24 +129,26 @@ const files = (state, action) => {
     case ActionTypes.RESET_PROJECT:
       return initialState();
     case ActionTypes.CREATE_FILE: // eslint-disable-line
-      {
-        const newState = state.map((file) => {
-          if (file.id === action.parentId) {
-            const newFile = Object.assign({}, file);
-            newFile.children = [...newFile.children, action.id];
-            return newFile;
-          }
-          return file;
-        });
-        return [...newState,
-          { name: action.name,
-            id: action.id,
-            _id: action._id,
-            content: action.content,
-            url: action.url,
-            children: action.children,
-            fileType: action.fileType || 'file' }];
-      }
+    {
+      const newState = state.map((file) => {
+        if (file.id === action.parentId) {
+          const newFile = Object.assign({}, file);
+          newFile.children = [...newFile.children, action.id];
+          return newFile;
+        }
+        return file;
+      });
+      return [...newState,
+        {
+          name: action.name,
+          id: action.id,
+          _id: action._id,
+          content: action.content,
+          url: action.url,
+          children: action.children,
+          fileType: action.fileType || 'file'
+        }];
+    }
     case ActionTypes.SHOW_FILE_OPTIONS:
       return state.map((file) => {
         if (file.id !== action.id) {
@@ -172,18 +174,18 @@ const files = (state, action) => {
         return Object.assign({}, file, { name: action.name });
       });
     case ActionTypes.DELETE_FILE:
-      {
-        const newState = deleteMany(state, [action.id, ...getAllDescendantIds(state, action.id)]);
-        return deleteChild(newState, action.parentId, action.id);
-        // const newState = state.map((file) => {
-        //   if (file.id === action.parentId) {
-        //     const newChildren = file.children.filter(child => child !== action.id);
-        //     return { ...file, children: newChildren };
-        //   }
-        //   return file;
-        // });
-        // return newState.filter(file => file.id !== action.id);
-      }
+    {
+      const newState = deleteMany(state, [action.id, ...getAllDescendantIds(state, action.id)]);
+      return deleteChild(newState, action.parentId, action.id);
+      // const newState = state.map((file) => {
+      //   if (file.id === action.parentId) {
+      //     const newChildren = file.children.filter(child => child !== action.id);
+      //     return { ...file, children: newChildren };
+      //   }
+      //   return file;
+      // });
+      // return newState.filter(file => file.id !== action.id);
+    }
     case ActionTypes.SHOW_EDIT_FILE_NAME:
       return state.map((file) => {
         if (file.id !== action.id) {
