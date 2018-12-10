@@ -30,6 +30,7 @@ export function renderIndex() {
         window.process.env.FORCE_TO_HTTPS = ${process.env.FORCE_TO_HTTPS === 'false' ? false : undefined};
         window.process.env.CLIENT = true;
         window.process.env.STATIC_MODE_ENABLED = ${process.env.STATIC_MODE_ENABLED === 'true' ? true : undefined};
+        window.process.env.LOGIN_ENABLED = ${process.env.LOGIN_ENABLED === 'false' ? false : true};
       </script>
     </head>
     <body>
