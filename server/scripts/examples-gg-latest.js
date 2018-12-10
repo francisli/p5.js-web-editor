@@ -5,8 +5,8 @@ import objectID from 'bson-objectid';
 import shortid from 'shortid';
 
 import eachSeries from 'async/eachSeries';
-import User from './models/user';
-import Project from './models/project';
+import User from '../models/user';
+import Project from '../models/project';
 
 // TODO: change to true when testing!
 const testMake = false;
@@ -21,14 +21,13 @@ const defaultHTML =
   `<!DOCTYPE html>
 <html>
   <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.dom.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.sound.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.sound.min.js"></script>
 
     <!-- Generative Design Dependencies here -->
     <!-- GG Bundled -->
-    <script src="https://rawgit.com/generative-design/Code-Package-p5.js/${branchName}/libraries/gg-dep-bundle/gg-dep-bundle.js"></script>
-
+    <script src="https://raw.githack.com/generative-design/Code-Package-p5.js/${branchName}/libraries/gg-dep-bundle/gg-dep-bundle.js"></script>
     <!-- Opentype -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/opentype.js/0.7.3/opentype.min.js"></script>
     <!-- Rita -->
@@ -36,7 +35,9 @@ const defaultHTML =
     <!-- Chroma -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.3.6/chroma.min.js"></script>
     <!-- Jquery -->
-    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script> 
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
 
     <!-- sketch additions -->
 
@@ -63,7 +64,9 @@ canvas {
 
 const headers = { 'User-Agent': 'p5js-web-editor/0.0.1' };
 
-mongoose.connect(process.env.MONGO_URL);
+const mongoConnectionString = process.env.MONGO_URL;
+
+mongoose.connect(mongoConnectionString, { useMongoClient: true });
 mongoose.connection.on('error', () => {
   console.error('MongoDB Connection Error. Please make sure that MongoDB is running.');
   process.exit(1);
@@ -426,10 +429,10 @@ function getAllSketchContent(newProjectList) {
         console.log(sketchFile.name);
         // https://cdn.rawgit.com/opensourcedesign/fonts/2f220059/gnu-freefont_freesans/FreeSans.otf?raw=true
         // "https://raw.githubusercontent.com/generative-design/Code-Package-p5.js/gg4editor/01_P/P_3_2_1_01/data/FreeSans.otf",
-        const rawGitRef = `https://cdn.rawgit.com/${newProject.files[i].url.split('.com/')[1]}`;
+        const rawGitRef = `https://raw.githack.com/${newProject.files[i].url.split('.com/')[1]}`;
         sketchFile.content = rawGitRef;
         sketchFile.url = rawGitRef;
-
+        // https://raw.githack.com/generative-design/Code-Package-p5.js/master/libraries/gg-dep-bundle/gg-dep-bundle.js
         // replace ref in sketch.js ==> should serve from the file?
         // newProject.files[1].content = newProject.files[1].content.replace(`'data/${sketchFile.name}'`, `'${rawGitRef}'`);
         resolve(newProject);

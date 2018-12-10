@@ -2,7 +2,8 @@ import axios from 'axios';
 
 import * as ActionTypes from '../../../constants';
 
-const ROOT_URL = process.env.API_URL;
+const __process = (typeof global !== 'undefined' ? global : window).process;
+const ROOT_URL = __process.env.API_URL;
 
 function setAssets(assets) {
   return {
@@ -11,9 +12,9 @@ function setAssets(assets) {
   };
 }
 
-export function getAssets(username) {
+export function getAssets() {
   return (dispatch, getState) => {
-    axios.get(`${ROOT_URL}/S3/${username}/objects`, { withCredentials: true })
+    axios.get(`${ROOT_URL}/S3/objects`, { withCredentials: true })
       .then((response) => {
         dispatch(setAssets(response.data.assets));
       })

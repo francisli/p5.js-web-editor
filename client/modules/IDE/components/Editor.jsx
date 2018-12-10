@@ -19,6 +19,7 @@ import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/search/matchesonscrollbar';
 import 'codemirror/addon/search/match-highlighter';
 import 'codemirror/addon/search/jump-to-line';
+import 'codemirror/addon/edit/matchbrackets';
 
 import { JSHINT } from 'jshint';
 import { CSSLint } from 'csslint';
@@ -28,6 +29,7 @@ import classNames from 'classnames';
 import { debounce } from 'lodash';
 import '../../../utils/htmlmixed';
 import '../../../utils/p5-javascript';
+import '../../../utils/webGL-clike';
 import Timer from '../components/Timer';
 import EditorAccessibility from '../components/EditorAccessibility';
 import {
@@ -86,6 +88,7 @@ class Editor extends React.Component {
       gutters: ['CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
       keyMap: 'sublime',
       highlightSelectionMatches: true, // highlight current search match
+      matchBrackets: true,
       lint: {
         onUpdateLinting: ((annotations) => {
           this.props.hideRuntimeErrorWarning();
@@ -99,6 +102,8 @@ class Editor extends React.Component {
         }
       }
     });
+
+    delete this._cm.options.lint.options.errors;
 
     this._cm.setOption('extraKeys', {
       [`${metaKey}-Enter`]: () => null,
@@ -115,8 +120,8 @@ class Editor extends React.Component {
       this.props.setUnsavedChanges(true);
       this.props.updateFileContent(this.props.file.name, this._cm.getValue());
       if (this.props.autorefresh && this.props.isPlaying) {
-        this.props.startRefreshSketch();
         this.props.clearConsole();
+        this.props.startRefreshSketch();
       }
     }, 400));
 
@@ -135,6 +140,7 @@ class Editor extends React.Component {
     this._cm.getWrapperElement().style['font-size'] = `${this.props.fontSize}px`;
     this._cm.setOption('indentWithTabs', this.props.isTabIndent);
     this._cm.setOption('tabSize', this.props.indentationAmount);
+    this._cm.setOption('indentUnit', this.props.indentationAmount);
 
     this.props.provideController({
       tidyCode: this.tidyCode,
@@ -170,6 +176,7 @@ class Editor extends React.Component {
     }
     if (this.props.indentationAmount !== prevProps.indentationAmount) {
       this._cm.setOption('tabSize', this.props.indentationAmount);
+      this._cm.setOption('indentUnit', this.props.indentationAmount);
     }
     if (this.props.isTabIndent !== prevProps.isTabIndent) {
       this._cm.setOption('indentWithTabs', this.props.isTabIndent);
@@ -184,11 +191,11 @@ class Editor extends React.Component {
     for (let i = 0; i < this._cm.lineCount(); i += 1) {
       this._cm.removeLineClass(i, 'background', 'line-runtime-error');
     }
-    if (this.props.runtimeErrorWarningVisible) {
+    if (this.props.runtimeErrorWarningVisible && this._cm.getDoc().modeOption === 'javascript') {
       this.props.consoleEvents.forEach((consoleEvent) => {
         if (consoleEvent.method === 'error') {
-          if (consoleEvent.arguments.indexOf(')') > -1) {
-            const n = consoleEvent.arguments.replace(')', '').split(' ');
+          if (consoleEvent.data[0].indexOf(')') > -1) {
+            const n = consoleEvent.data[0].replace(')', '').split(' ');
             const lineNumber = parseInt(n[n.length - 1], 10) - 1;
             this._cm.addLineClass(lineNumber, 'background', 'line-runtime-error');
           }
@@ -212,6 +219,8 @@ class Editor extends React.Component {
       mode = 'htmlmixed';
     } else if (fileName.match(/.+\.json$/i)) {
       mode = 'application/json';
+    } else if (fileName.match(/.+\.(frag|vert)$/i)) {
+      mode = 'clike';
     } else {
       mode = 'text/plain';
     }

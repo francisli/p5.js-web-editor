@@ -2,13 +2,72 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import InlineSVG from 'react-inlinesvg';
 import classNames from 'classnames';
+import { Console as ConsoleFeed } from 'console-feed';
+import {
+  CONSOLE_FEED_WITHOUT_ICONS, CONSOLE_FEED_LIGHT_STYLES,
+  CONSOLE_FEED_DARK_STYLES, CONSOLE_FEED_CONTRAST_STYLES
+} from '../../../styles/components/_console-feed.scss';
+import warnLightUrl from '../../../images/console-warn-light.svg';
+import warnDarkUrl from '../../../images/console-warn-dark.svg';
+import errorLightUrl from '../../../images/console-error-light.svg';
+import errorDarkUrl from '../../../images/console-error-dark.svg';
+import debugLightUrl from '../../../images/console-debug-light.svg';
+import debugDarkUrl from '../../../images/console-debug-dark.svg';
+import infoLightUrl from '../../../images/console-info-light.svg';
+import infoDarkUrl from '../../../images/console-info-dark.svg';
 
 const upArrowUrl = require('../../../images/up-arrow.svg');
 const downArrowUrl = require('../../../images/down-arrow.svg');
 
 class Console extends React.Component {
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     this.consoleMessages.scrollTop = this.consoleMessages.scrollHeight;
+    if (this.props.theme !== prevProps.theme) {
+      this.props.clearConsole();
+      this.props.dispatchConsoleEvent(this.props.consoleEvents);
+    }
+
+    if (this.props.fontSize !== prevProps.fontSize) {
+      this.props.clearConsole();
+      this.props.dispatchConsoleEvent(this.props.consoleEvents);
+    }
+  }
+
+  getConsoleFeedStyle(theme, times) {
+    const style = {};
+    const CONSOLE_FEED_LIGHT_ICONS = {
+      LOG_WARN_ICON: `url(${warnLightUrl})`,
+      LOG_ERROR_ICON: `url(${errorLightUrl})`,
+      LOG_DEBUG_ICON: `url(${debugLightUrl})`,
+      LOG_INFO_ICON: `url(${infoLightUrl})`
+    };
+    const CONSOLE_FEED_DARK_ICONS = {
+      LOG_WARN_ICON: `url(${warnDarkUrl})`,
+      LOG_ERROR_ICON: `url(${errorDarkUrl})`,
+      LOG_DEBUG_ICON: `url(${debugDarkUrl})`,
+      LOG_INFO_ICON: `url(${infoDarkUrl})`
+    };
+    const CONSOLE_FEED_SIZES = {
+      TREENODE_LINE_HEIGHT: 1.2,
+      BASE_FONT_SIZE: this.props.fontSize,
+      ARROW_FONT_SIZE: this.props.fontSize,
+      LOG_ICON_WIDTH: this.props.fontSize,
+      LOG_ICON_HEIGHT: 1.45 * this.props.fontSize,
+    };
+
+    if (times > 1) {
+      Object.assign(style, CONSOLE_FEED_WITHOUT_ICONS);
+    }
+    switch (theme) {
+      case 'light':
+        return Object.assign(CONSOLE_FEED_LIGHT_STYLES, CONSOLE_FEED_LIGHT_ICONS, CONSOLE_FEED_SIZES, style);
+      case 'dark':
+        return Object.assign(CONSOLE_FEED_DARK_STYLES, CONSOLE_FEED_DARK_ICONS, CONSOLE_FEED_SIZES, style);
+      case 'contrast':
+        return Object.assign(CONSOLE_FEED_CONTRAST_STYLES, CONSOLE_FEED_DARK_ICONS, CONSOLE_FEED_SIZES, style);
+      default:
+        return '';
+    }
   }
 
   render() {
@@ -39,17 +98,22 @@ class Console extends React.Component {
         </div>
         <div ref={(element) => { this.consoleMessages = element; }} className="preview-console__messages">
           {this.props.consoleEvents.map((consoleEvent) => {
-            const { arguments: args, method } = consoleEvent;
-            if (Object.keys(args).length === 0) {
-              return (
-                <div key={consoleEvent.id} className="preview-console__undefined">
-                  <span key={`${consoleEvent.id}-0`}>undefined</span>
-                </div>
-              );
-            }
+            const { method, times } = consoleEvent;
+            const { theme } = this.props;
             return (
-              <div key={consoleEvent.id} className={`preview-console__${method}`}>
-                {Object.keys(args).map(key => <span key={`${consoleEvent.id}-${key}`}>{args[key]}</span>)}
+              <div key={consoleEvent.id} className={`preview-console__message preview-console__message--${method}`}>
+                { times > 1 &&
+                  <div
+                    className="preview-console__logged-times"
+                    style={{ fontSize: this.props.fontSize, borderRadius: this.props.fontSize / 2 }}
+                  >
+                    {times}
+                  </div>
+                }
+                <ConsoleFeed
+                  styles={this.getConsoleFeedStyle(theme, times)}
+                  logs={[consoleEvent]}
+                />
               </div>
             );
           })}
@@ -67,7 +131,10 @@ Console.propTypes = {
   isExpanded: PropTypes.bool.isRequired,
   collapseConsole: PropTypes.func.isRequired,
   expandConsole: PropTypes.func.isRequired,
-  clearConsole: PropTypes.func.isRequired
+  clearConsole: PropTypes.func.isRequired,
+  dispatchConsoleEvent: PropTypes.func.isRequired,
+  theme: PropTypes.string.isRequired,
+  fontSize: PropTypes.number.isRequired
 };
 
 Console.defaultProps = {

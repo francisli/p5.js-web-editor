@@ -32,10 +32,17 @@ router.get('/:username/sketches/:project_id', (req, res) => {
   ));
 });
 
+router.get('/:username/full/:project_id', (req, res) => {
+  projectForUserExists(req.params.username, req.params.project_id, exists => (
+    exists ? res.send(renderIndex()) : get404Sketch(html => res.send(html))
+  ));
+});
 
-// router.get('/full/:project_id', (req, res) => {
-//   res.send(renderIndex());
-// });
+router.get('/full/:project_id', (req, res) => {
+  projectExists(req.params.project_id, exists => (
+    exists ? res.send(renderIndex()) : get404Sketch(html => res.send(html))
+  ));
+});
 
 router.get('/login', (req, res) => {
   if (req.user) {
@@ -57,7 +64,27 @@ router.get('/verify', (req, res) => {
 });
 
 router.get('/sketches', (req, res) => {
-  res.send(renderIndex());
+  if (req.user) {
+    res.send(renderIndex());
+  } else {
+    res.redirect('/login');
+  }
+});
+
+router.get('/assets', (req, res) => {
+  if (req.user) {
+    res.send(renderIndex());
+  } else {
+    res.redirect('/login');
+  }
+});
+
+router.get('/account', (req, res) => {
+  if (req.user) {
+    res.send(renderIndex());
+  } else {
+    res.redirect('/login');
+  }
 });
 
 router.get('/about', (req, res) => {
@@ -69,18 +96,6 @@ router.get('/feedback', (req, res) => {
 });
 
 router.get('/:username/sketches', (req, res) => {
-  userExists(req.params.username, exists => (
-    exists ? res.send(renderIndex()) : get404Sketch(html => res.send(html))
-  ));
-});
-
-router.get('/:username/assets', (req, res) => {
-  userExists(req.params.username, exists => (
-    exists ? res.send(renderIndex()) : get404Sketch(html => res.send(html))
-  ));
-});
-
-router.get('/:username/account', (req, res) => {
   userExists(req.params.username, exists => (
     exists ? res.send(renderIndex()) : get404Sketch(html => res.send(html))
   ));

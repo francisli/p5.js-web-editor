@@ -2,42 +2,6 @@ import {
   EXTERNAL_LINK_REGEX
 } from '../../server/utils/fileUtils';
 
-export const hijackConsole = `var iframeWindow = window;
-  var originalConsole = iframeWindow.console;
-  iframeWindow.console = {};
-  
-  var methods = [
-    'debug', 'clear', 'error', 'info', 'log', 'warn'
-  ];
-  
-  var consoleBuffer = [];
-  var LOGWAIT = 500;
-  
-  methods.forEach( function(method) {
-    iframeWindow.console[method] = function() {
-      originalConsole[method].apply(originalConsole, arguments);
-  
-      var args = Array.from(arguments);
-      args = args.map(function(i) {
-        // catch objects
-        return (typeof i === 'string') ? i : JSON.stringify(i);
-      });
-  
-      consoleBuffer.push({
-        method: method,
-        arguments: args,
-        source: 'sketch'
-      });
-    };
-  });
-  
-  setInterval(function() {
-    if (consoleBuffer.length > 0) {
-      window.parent.postMessage(consoleBuffer, '*');
-      consoleBuffer.length = 0;
-    }
-  }, LOGWAIT);`;
-
 export const hijackConsoleErrorsScript = (offs) => {
   const s = `
     function getScriptOff(line) {
@@ -67,8 +31,11 @@ export const hijackConsoleErrorsScript = (offs) => {
           data = msg + ' (' + fileInfo[1] + ': line ' + fileInfo[0] + ')';
         }
         window.parent.postMessage([{
-          method: 'error',
-          arguments: data,
+          log: [{
+            method: 'error',
+            data: [data],
+            id: Date.now().toString()
+          }],
           source: fileInfo[1]
         }], '*');
       return false;
@@ -94,8 +61,8 @@ export const getAllScriptOffsets = (htmlFile) => {
     } else {
       endFilenameInd = htmlFile.indexOf('.js', ind + startTag.length + 3);
       filename = htmlFile.substring(ind + startTag.length, endFilenameInd);
-      // the length of hijackConsoleErrorsScript is 33 lines
-      lineOffset = htmlFile.substring(0, ind).split('\n').length + 33;
+      // the length of hijackConsoleErrorsScript is 36 lines
+      lineOffset = htmlFile.substring(0, ind).split('\n').length + 36;
       offs.push([lineOffset, filename]);
       lastInd = ind + 1;
     }
