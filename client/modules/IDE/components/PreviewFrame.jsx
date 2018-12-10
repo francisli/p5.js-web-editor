@@ -22,6 +22,8 @@ import {
 import { hijackConsoleErrorsScript, startTag, getAllScriptOffsets }
   from '../../../utils/consoleUtils';
 
+const __process = (typeof global !== 'undefined' ? global : window).process;
+
 class PreviewFrame extends React.Component {
   constructor(props) {
     super(props);
@@ -284,8 +286,8 @@ class PreviewFrame extends React.Component {
           } else {
             script.setAttribute('data-tag', `${startTag}${resolvedFile.name}`);
             script.removeAttribute('src');
-            let content = resolvedFile.content;
-            if (resolvedFile.name === 'sketch.js') {
+            let { content } = resolvedFile;
+            if (__process.env.STATIC_MODE_ENABLED && resolvedFile.name === 'sketch.js') {
               if (!/function\s+setup\s*\(\s*\)/.test(content)) {
                 if (!/createCanvas\s*\([^)]*\)/.test(content)) {
                   content = `createCanvas(400, 400);${content}`;
@@ -293,7 +295,7 @@ class PreviewFrame extends React.Component {
                 content = `function setup(){${content}}`;
               }
             }
-            script.innerHTML = content; // eslint-disable-line
+            script.innerHTML = content;
           }
         }
       } else if (!(script.getAttribute('src') && script.getAttribute('src').match(EXTERNAL_LINK_REGEX)) !== null) {
